@@ -18,17 +18,16 @@ if sys.getdefaultencoding() != default_encoding:
 
 try:
     print "Load local setting..."
-    new_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    new_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if new_path not in sys.path:
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        sys.path.append(new_path)
+
     from conf.settings import settings, LOAD_MODULE, REJECT_MODULE
 except ImportError, e:
     print e
     print "Load local setting error, load base settings..."
-    new_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if new_path not in sys.path:
-        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from base_conf.settings import settings, LOAD_MODULE, REJECT_MODULE
+
+    from base.base_conf.settings import settings, LOAD_MODULE, REJECT_MODULE
 
 
 def current_path():
