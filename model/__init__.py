@@ -5,9 +5,11 @@ from datetime import datetime, date
 
 try:
     from conf.settings import database, BASE_DB, settings
+
     logging.info("Data config by local......")
 except ImportError:
     from base.base_conf.settings import database, BASE_DB, settings
+
     logging.info("Data config by base......")
 
 from base.base_lib.dbpool import with_database_class, install
@@ -213,6 +215,24 @@ class BaseModel:
                 if data[field] == info["id"]:
                     data[info_field] = info
         return datas
+
+    def add_count(self, field_name, count=1):
+        """ 给int字段加值
+        @param field_name: 字段名
+        @param count: 加的数量，默认1，可以是负数
+        @return: 成功与否
+        """
+        try:
+            sql = "update %s set %s = %s + %d where id = %d" % (
+                self.__table__, field_name, field_name, count, self.id
+            )
+            self.execute(sql)
+            return True
+        except Exception, e:
+            import logging
+            logging.error("Add count error, info:%s" % e)
+            return False
+
 
 if __name__ == "__main__":
     b = BaseModel()
