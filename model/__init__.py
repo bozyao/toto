@@ -49,6 +49,9 @@ class BaseModel:
     def get(self, key, value=""):
         return self.real_dict().get(key, value)
 
+    def set(self, key, value=""):
+        self.__dict__[key] = value
+
     def to_json(self, data=None):
         """输出有意义的属性json格式
         @param data: 要转化的数据，默认为空，使用对象本身
