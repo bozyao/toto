@@ -57,7 +57,7 @@ database = {
         'port': 3306,
         'user': 'bozyao',
         'passwd': 'bozyao',
-        'charset': 'utf8bm4',
+        'charset': 'utf8mb4',
         'conn': 20
     }
 }
