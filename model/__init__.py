@@ -236,6 +236,10 @@ class BaseModel:
             logging.error("Add count error, info:%s" % e)
             return False
 
+    def get_count(self, where={}):
+        tmp_data = self.select(where, fields="count(id) as count")
+        return tmp_data[0]["count"]
+
 
 if __name__ == "__main__":
     b = BaseModel()
