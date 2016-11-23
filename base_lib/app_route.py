@@ -143,7 +143,7 @@ class RequestHandler(tornado.web.RequestHandler):
 
     # 统一错误输出
     def ret_error(self, error_info, msg=ERROR_MSG):
-        data = {"error_code": ERROR_CODE.get(error_info, 11111), "msg": msg}
+        data = {"error_code": ERROR_CODE.get(error_info, 11111), "error_msg": msg}
         self.write(json.dumps(data))
 
         if not self._finished:
