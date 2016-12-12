@@ -236,9 +236,12 @@ class BaseModel:
             logging.error("Add count error, info:%s" % e)
             return False
 
-    def get_count(self, where={}):
-        tmp_data = self.select(where, fields="count(id) as count")
+    def get_count(self, where={}, other=""):
+        tmp_data = self.select(where, other=other, fields="count(id) as count")
         return tmp_data[0]["count"]
+
+    def get_page_data(self, where={}, other="", page_num=1, page_count=10):
+        return self.db.get_page_data(self.__table__, where, self.__fields__, other, page_num, page_count)
 
 
 if __name__ == "__main__":
