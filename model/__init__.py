@@ -41,9 +41,11 @@ class BaseModel:
         """
         __table__: 实体表明
         __fields__: 字段
+        __id__fields__: 主键，默认为id，不用设置
         """
         self.__table__ = ""
         self.__fields__ = "id"
+        self.__id__fields__ = "id"
         # 考虑是否加入类型，默认值，范围等？
 
     def get(self, key, value=""):
@@ -95,7 +97,7 @@ class BaseModel:
         if not self.__table__:
             return 0
         try:
-            if self.real_dict().get("id", 0):
+            if self.real_dict().get(self.__id__fields__, 0):
                 return self.update()
             return self.db.insert(self.__table__, self.real_dict())
         except:
@@ -106,10 +108,11 @@ class BaseModel:
         @param:
         @return: 成功与否
         """
-        if not self.__table__ or not self.real_dict().get("id", 0):
+        id_ = self.real_dict().get(self.__id__fields__, 0)
+        if not self.__table__ or not id_:
             return 0
         try:
-            return self.db.update(self.__table__, self.real_dict(), {"id": self.id})
+            return self.db.update(self.__table__, self.real_dict(), {self.__id__fields__: id_})
         except:
             return 0
 
@@ -122,8 +125,9 @@ class BaseModel:
         if not self.__table__:
             return 0
         if not where:
-            if self.real_dict().get("id", ""):
-                where = {"id": self.id}
+            id_ = self.real_dict().get(self.__id__fields__, "")
+            if id_:
+                where = {self.__id__fields__: id_}
             else:
                 return 0
         ret = 0
@@ -138,7 +142,7 @@ class BaseModel:
         """
         if not self.__table__:
             return 0
-        ret = self.db.delete(self.__table__, {"id": id})
+        ret = self.db.delete(self.__table__, {self.__id__fields__: id})
         return ret
 
     def get_by_id(self, id):
@@ -149,7 +153,7 @@ class BaseModel:
         if not self.__table__:
             return {}
 
-        ret = self.db.select(self.__table__, {"id": id}, self.__fields__)
+        ret = self.db.select(self.__table__, {self.__id__fields__: id}, self.__fields__)
         if ret:
             # return self.to_json(ret[0])
             return ret[0]
@@ -212,10 +216,10 @@ class BaseModel:
         ids = ",".join([str(data[field]) for data in datas if data[field]])
         if not ids:
             return datas
-        infos = self.select(other="where id in (%s)" % ids)
+        infos = self.select(other="where %s in (%s)" % (self.__id__fields__, ids))
         for info in infos:
             for data in datas:
-                if data[field] == info["id"]:
+                if data[field] == info[self.__id__fields__]:
                     data[info_field] = info
         return datas
 
@@ -226,8 +230,9 @@ class BaseModel:
         @return: 成功与否
         """
         try:
-            sql = "update %s set %s = %s + %d where id = %d" % (
-                self.__table__, field_name, field_name, count, self.id
+            id_ = self.real_dict().get(self.__id__fields__, 0)
+            sql = "update %s set %s = %s + %d where %s = %d" % (
+                self.__table__, field_name, field_name, count, self.__id__fields__, id_
             )
             self.execute(sql)
             return True
@@ -237,7 +242,7 @@ class BaseModel:
             return False
 
     def get_count(self, where={}):
-        tmp_data = self.select(where, fields="count(id) as count")
+        tmp_data = self.select(where, fields="count(" + self.__id__fields__ + ") as count")
         return tmp_data[0]["count"]
 
 
